@@ -6,6 +6,10 @@
 # kludge, just add a file in the kludges/ subdirectory.
 file(GLOB COMPILER_KLUDGE_FILES ${CMAKE_CURRENT_LIST_DIR}/kludges/*.cmake)
 
+include(CheckCXXCompilerFlag)
+include(CheckCXXSourceCompiles)
+include(CheckCXXSourceRuns)
+
 macro(CompilerKludges)
   add_library(compiler-kludges INTERFACE)
 
