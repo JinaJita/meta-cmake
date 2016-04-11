@@ -55,6 +55,13 @@ function(FindOrBuildICU)
         set(ICU_PLATFORM "Linux")
       endif()
 
+      # if we're compling with position independent code, force ICU to do
+      # so as well
+      if (CMAKE_POSITION_INDEPENDENT_CODE)
+        set(ICU_CFLAGS "-fPIC")
+        set(ICU_CXXFLAGS "-fPIC")
+      endif()
+
       # determine a reasonable number of threads to build ICU with
       include(ProcessorCount)
       ProcessorCount(CORES)
@@ -74,7 +81,7 @@ function(FindOrBuildICU)
         PREFIX ${ICU_EP_PREFIX}
         URL ${FindOrBuildICU_URL}
         URL_HASH ${FindOrBuildICU_URL_HASH}
-        CONFIGURE_COMMAND CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} ${ICU_EP_PREFIX}/src/ExternalICU/source/runConfigureICU ${ICU_PLATFORM}
+        CONFIGURE_COMMAND CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=${ICU_CFLAGS} CXXFLAGS=${ICU_CXXFLAGS} ${ICU_EP_PREFIX}/src/ExternalICU/source/runConfigureICU ${ICU_PLATFORM}
         --disable-shared --enable-static --disable-dyload --disable-extras
         --disable-tests --disable-samples
         --prefix=<INSTALL_DIR>
