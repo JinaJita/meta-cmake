@@ -37,20 +37,18 @@ function(FindOrBuildICU)
     else()
       message("-- ICU version found is ${ICU_VERSION}, expected ${FindOrBuildICU_VERSION}; attempting to build ICU from scratch...")
     endif()
-    if (WIN32)
+    if (WIN32 AND NOT MINGW)
       # not going to attempt to build ICU if we're on Windows for now
       # probably could, but it's more trouble than it's worth I think
       message("-- ICU building not supported on Windows.")
-      if (MINGW)
-        message(FATAL_ERROR "   -- If on MSYS2; please install the icu package via pacman")
-      else()
-        message(FATAL_ERROR "   -- Please download the latest ICU binaries from http://site.icu-project.org/download")
-      endif()
-    elseif(UNIX)
+      message(FATAL_ERROR "   -- Please download the latest ICU binaries from http://site.icu-project.org/download")
+    elseif(UNIX OR MINGW)
 
       # determine platform for runConfigureICU
       if (APPLE)
         set(ICU_PLATFORM "MacOSX")
+      elseif(MINGW)
+        set(ICU_PLATFORM "MinGW")
       else()
         set(ICU_PLATFORM "Linux")
       endif()
@@ -77,6 +75,16 @@ function(FindOrBuildICU)
 
       set(ICU_EP_PREFIX ${PROJECT_SOURCE_DIR}/deps/icu)
 
+      if (MINGW)
+        set(ICU_EP_LIBICUDATA ${ICU_EP_PREFIX}/lib/sicudt.a)
+        set(ICU_EP_LIBICUI18N ${ICU_EP_PREFIX}/lib/libsicuin.a)
+        set(ICU_EP_LIBICUUC ${ICU_EP_PREFIX}/lib/libsicuuc.a)
+      else()
+        set(ICU_EP_LIBICUDATA ${ICU_EP_PREFIX}/lib/libicudata.a)
+        set(ICU_EP_LIBICUI18N ${ICU_EP_PREFIX}/lib/libicui18n.a)
+        set(ICU_EP_LIBICUUC ${ICU_EP_PREFIX}/lib/libicuuc.a)
+      endif()
+
       ExternalProject_Add(ExternalICU
         PREFIX ${ICU_EP_PREFIX}
         URL ${FindOrBuildICU_URL}
@@ -87,23 +95,23 @@ function(FindOrBuildICU)
         --prefix=<INSTALL_DIR>
         BUILD_COMMAND make ${ICU_MAKE_EXTRA_FLAGS}
         INSTALL_COMMAND make install
-        BUILD_BYPRODUCTS ${ICU_EP_PREFIX}/lib/libicudata.a;${ICU_EP_PREFIX}/lib/libicui18n.a;${ICU_EP_PREFIX}/lib/libicuuc.a
+        BUILD_BYPRODUCTS ${ICU_EP_LIBICUDATA};${ICU_EP_LIBICUI18N};${ICU_EP_LIBICUUC}
       )
       set(ICU_INCLUDE_DIRS ${ICU_EP_PREFIX}/include)
 
       add_library(icudata IMPORTED STATIC)
       set_target_properties(icudata PROPERTIES IMPORTED_LOCATION
-        ${ICU_EP_PREFIX}/lib/libicudata.a)
+        ${ICU_EP_LIBICUDATA})
       add_dependencies(icudata ExternalICU)
 
       add_library(icui18n IMPORTED STATIC)
       set_target_properties(icui18n PROPERTIES IMPORTED_LOCATION
-        ${ICU_EP_PREFIX}/lib/libicui18n.a)
+        ${ICU_EP_LIBICUI18N})
       add_dependencies(icui18n ExternalICU)
 
       add_library(icuuc IMPORTED STATIC)
       set_target_properties(icuuc PROPERTIES IMPORTED_LOCATION
-        ${ICU_EP_PREFIX}/lib/libicuuc.a)
+        ${ICU_EP_LIBICUUC})
       add_dependencies(icuuc ExternalICU)
 
       set(ICU_LIBRARIES icui18n icuuc icudata)
