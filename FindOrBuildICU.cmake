@@ -31,8 +31,9 @@ function(FindOrBuildICU)
 
   find_package(ICU ${FindOrBuildICU_VERSION} COMPONENTS data i18n uc)
 
-  if (NOT ICU_FOUND OR NOT ICU_VERSION VERSION_EQUAL "${FindOrBuildICU_VERSION}")
-    if (NOT ICU_FOUND)
+  if (NOT ICU_VERSION OR NOT ICU_VERSION VERSION_EQUAL "${FindOrBuildICU_VERSION}")
+    # for some reason, ICU_FOUND seems to always be set...
+    if (NOT ICU_VERSION)
       message("-- ICU not found; attempting to build it...")
     else()
       message("-- ICU version found is ${ICU_VERSION}, expected ${FindOrBuildICU_VERSION}; attempting to build ICU from scratch...")
