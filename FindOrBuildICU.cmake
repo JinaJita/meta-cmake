@@ -1,6 +1,8 @@
 include(CMakeParseArguments)
 include(ExternalProject)
 
+set(FIND_OR_BUILD_ICU_DIR ${CMAKE_CURRENT_LIST_DIR})
+
 # Searches the system using find_package for an ICU version that is greater
 # or equal to the minimum version specified via the VERSION argument to the
 # function. If find_package does not find a suitable version, ICU is added
@@ -80,16 +82,19 @@ function(FindOrBuildICU)
         set(ICU_EP_LIBICUDATA ${ICU_EP_PREFIX}/lib/sicudt.a)
         set(ICU_EP_LIBICUI18N ${ICU_EP_PREFIX}/lib/libsicuin.a)
         set(ICU_EP_LIBICUUC ${ICU_EP_PREFIX}/lib/libsicuuc.a)
+        set(ICU_EP_PATCH_COMMAND patch -p0 -i ${FIND_OR_BUILD_ICU_DIR}/msys-mkinstalldirs.patch)
       else()
         set(ICU_EP_LIBICUDATA ${ICU_EP_PREFIX}/lib/libicudata.a)
         set(ICU_EP_LIBICUI18N ${ICU_EP_PREFIX}/lib/libicui18n.a)
         set(ICU_EP_LIBICUUC ${ICU_EP_PREFIX}/lib/libicuuc.a)
+        set(ICU_EP_PATCH_COMMAND "")
       endif()
 
       ExternalProject_Add(ExternalICU
         PREFIX ${ICU_EP_PREFIX}
         URL ${FindOrBuildICU_URL}
         URL_HASH ${FindOrBuildICU_URL_HASH}
+        PATCH_COMMAND ${ICU_EP_PATCH_COMMAND}
         CONFIGURE_COMMAND CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=${ICU_CFLAGS} CXXFLAGS=${ICU_CXXFLAGS} ${ICU_EP_PREFIX}/src/ExternalICU/source/runConfigureICU ${ICU_PLATFORM}
         --disable-shared --enable-static --disable-dyload --disable-extras
         --disable-tests --disable-samples
