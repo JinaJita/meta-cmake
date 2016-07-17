@@ -1,7 +1,9 @@
 # experimental::filesystem is packaged as a separate static library in
 # GCC >= 5.3 as -lstdc++fs
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-  find_library(STDCXX_FILESYSTEM NAMES stdc++fs)
+  find_library(STDCXX_FILESYSTEM
+    NAMES stdc++fs
+    HINTS ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES})
 
   if (STDCXX_FILESYSTEM)
     message("-- Found libstdc++ filesystem: ${STDCXX_FILESYSTEM}")
