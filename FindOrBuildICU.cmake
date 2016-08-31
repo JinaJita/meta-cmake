@@ -29,14 +29,20 @@ function(FindOrBuildICU)
 
   message("-- Searching for ICU ${FindOrBuildICU_VERSION}")
 
-  find_package(ICU ${FindOrBuildICU_VERSION} COMPONENTS data i18n uc)
+  if (NOT BUILD_STATIC_ICU)
+    find_package(ICU ${FindOrBuildICU_VERSION} COMPONENTS data i18n uc)
+  endif()
 
-  if (NOT ICU_VERSION OR NOT ICU_VERSION VERSION_EQUAL "${FindOrBuildICU_VERSION}")
+  if (BUILD_STATIC_ICU OR NOT ICU_VERSION OR NOT ICU_VERSION VERSION_EQUAL "${FindOrBuildICU_VERSION}")
     # for some reason, ICU_FOUND seems to always be set...
-    if (NOT ICU_VERSION)
-      message("-- ICU not found; attempting to build it...")
+    if (BUILD_STATIC_ICU)
+      message("-- Building a static ICU was forced")
     else()
-      message("-- ICU version found is ${ICU_VERSION}, expected ${FindOrBuildICU_VERSION}; attempting to build ICU from scratch...")
+      if (NOT ICU_VERSION)
+        message("-- ICU not found; attempting to build it...")
+      else()
+        message("-- ICU version found is ${ICU_VERSION}, expected ${FindOrBuildICU_VERSION}; attempting to build ICU from scratch...")
+      endif()
     endif()
     if (WIN32 AND NOT MINGW)
       # not going to attempt to build ICU if we're on Windows for now
