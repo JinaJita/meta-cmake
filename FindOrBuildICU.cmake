@@ -62,7 +62,7 @@ function(FindOrBuildICU)
 
       # if we're compling with position independent code, force ICU to do
       # so as well
-      if (CMAKE_POSITION_INDEPENDENT_CODE)
+      if (CMAKE_POSITION_INDEPENDENT_CODE OR BUILD_SHARED_LIBS)
         set(ICU_CFLAGS "-fPIC")
         set(ICU_CXXFLAGS "-fPIC")
       endif()
