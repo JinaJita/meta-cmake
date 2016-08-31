@@ -7,10 +7,8 @@ set(FIND_OR_BUILD_ICU_DIR ${CMAKE_CURRENT_LIST_DIR})
 # or equal to the minimum version specified via the VERSION argument to the
 # function. If find_package does not find a suitable version, ICU is added
 # as an external project to be downloaded form the specified URL and
-# validated with the specified URL_HASH. Currently, building ICU is only
-# supported on Linux and OS X; on Windows precompiled binaries must be
-# used, either via -DICU_ROOT=C:/path/to/icu or with MSYS2's icu package.
-#
+# validated with the specified URL_HASH.
+
 # The function creates an interface library "icu" that should be linked
 # against by code that wishes to use ICU headers or ICU library functions.
 # The library target added should ensure that transitive dependencies are
