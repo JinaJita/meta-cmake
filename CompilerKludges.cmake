@@ -5,6 +5,7 @@
 # Each file in the kludges/ subdirectory is included(). To add another
 # kludge, just add a file in the kludges/ subdirectory.
 file(GLOB COMPILER_KLUDGE_FILES ${CMAKE_CURRENT_LIST_DIR}/kludges/*.cmake)
+set(COMPILER_KLUDGE_HEADER_INPUT ${CMAKE_CURRENT_LIST_DIR}/kludges.h.in)
 
 include(CheckCXXCompilerFlag)
 include(CheckCXXSourceCompiles)
@@ -16,4 +17,8 @@ macro(CompilerKludges)
   foreach(kludge ${COMPILER_KLUDGE_FILES})
     include(${kludge})
   endforeach()
+
+  if (${ARGC})
+    configure_file(${COMPILER_KLUDGE_HEADER_INPUT} ${ARGV0})
+  endif()
 endmacro()

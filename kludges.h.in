@@ -1,0 +1,23 @@
+// AlignedAlloc.cmake
+#cmakedefine META_HAS_ALIGNED_ALLOC
+#cmakedefine META_HAS_POSIX_MEMALIGN
+#cmakedefine META_HAS_ALIGNED_MALLOC
+
+// Expect.cmake
+#cmakedefine META_HAS_BUILTIN_EXPECT
+
+// ExperimentalFilesystem.cmake
+#cmakedefine META_HAS_EXPERIMENTAL_FILESYSTEM
+#cmakedefine META_HAS_EXPERIMENTAL_FILESYSTEM_REMOVE_ALL
+
+// ExperimentalOptional.cmake
+#cmakedefine META_HAS_EXPERIMENTAL_OPTIONAL
+
+// ExperimentalStringView.cmake
+#cmakedefine META_HAS_EXPERIMENTAL_STRING_VIEW
+
+// MakeUnique.cmake
+#cmakedefine META_HAS_STD_MAKE_UNIQUE
+
+// SharedPtrAtomics.cmake
+#cmakedefine META_HAS_SHARED_PTR_ATOMICS
