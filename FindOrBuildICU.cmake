@@ -9,10 +9,8 @@ set(FIND_OR_BUILD_ICU_DIR ${CMAKE_CURRENT_LIST_DIR})
 # as an external project to be downloaded form the specified URL and
 # validated with the specified URL_HASH.
 
-# The function creates an interface library "icu" that should be linked
-# against by code that wishes to use ICU headers or ICU library functions.
-# The library target added should ensure that transitive dependencies are
-# satisfied.
+# The function sets the variables ICU_LIBRARIES and ICU_INCLUDE_DIRS
+# for use by targets that wish to use ICU headers or ICU library functions.
 #
 # This function requires at least CMake version 3.2.0 for the
 # BUILD_BYPRODUCTS argument to ExternalProject_Add
@@ -125,7 +123,7 @@ function(FindOrBuildICU)
       add_dependencies(icuuc ExternalICU)
 
       set(ICU_LIBRARIES icui18n icuuc icudata)
-      set(ICU_IS_EXTERNAL TRUE)
+      set(ICU_IS_EXTERNAL TRUE PARENT_SCOPE)
     else()
       message(FATAL_ERROR "-- ICU building not supported for this platform")
     endif()
@@ -134,10 +132,10 @@ function(FindOrBuildICU)
   message("-- ICU include dirs: ${ICU_INCLUDE_DIRS}")
   message("-- ICU libraries: ${ICU_LIBRARIES}")
 
-  add_library(icu INTERFACE)
+  set(ICU_INCLUDE_DIRS ${ICU_INCLUDE_DIRS} PARENT_SCOPE)
+  set(ICU_LIBRARIES ${ICU_LIBRARIES} PARENT_SCOPE)
+
   if (ICU_IS_EXTERNAL)
     file(MAKE_DIRECTORY ${ICU_INCLUDE_DIRS})
   endif()
-  target_link_libraries(icu INTERFACE ${ICU_LIBRARIES})
-  target_include_directories(icu SYSTEM INTERFACE ${ICU_INCLUDE_DIRS})
 endfunction()
