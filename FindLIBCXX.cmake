@@ -10,9 +10,14 @@ if(LIBCXX_LIBRARY)
     DIRECTORY)
   find_path(LIBCXX_PREFIX c++/v1/algorithm
     PATHS ${LIBCXX_LIB_PATH}/../include
-    ${CMAKE_SYSTEM_PREFIX_PATH})
-  set(LIBCXX_INCLUDE_DIR ${LIBCXX_PREFIX}/c++/v1/)
-  message("-- Located libc++ include path: ${LIBCXX_INCLUDE_DIR}")
+    ${CMAKE_SYSTEM_PREFIX_PATH}
+    /Library/Developer/CommandLineTools/usr/include)
+  if (LIBCXX_PREFIX)
+    set(LIBCXX_INCLUDE_DIR ${LIBCXX_PREFIX}/c++/v1/)
+    message("-- Located libc++ include path: ${LIBCXX_INCLUDE_DIR}")
+  else()
+    message("-- Failed to find libc++ include path!")
+  endif()
 
   message("--     Locating libc++'s abi...")
   find_library(LIBCXXABI_LIBRARY NAMES c++abi)
