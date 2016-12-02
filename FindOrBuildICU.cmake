@@ -48,16 +48,6 @@ function(FindOrBuildICU)
       message("-- ICU building not supported on Windows.")
       message(FATAL_ERROR "   -- Please download the latest ICU binaries from http://site.icu-project.org/download")
     elseif(UNIX OR MINGW)
-
-      # determine platform for runConfigureICU
-      if (APPLE)
-        set(ICU_PLATFORM "MacOSX")
-      elseif(MINGW)
-        set(ICU_PLATFORM "MinGW")
-      else()
-        set(ICU_PLATFORM "Linux")
-      endif()
-
       # if we're compling with position independent code, force ICU to do
       # so as well
       if (CMAKE_POSITION_INDEPENDENT_CODE OR BUILD_SHARED_LIBS)
@@ -93,17 +83,32 @@ function(FindOrBuildICU)
       endif()
 
       ExternalProject_Add(ExternalICU
-        PREFIX ${ICU_EP_PREFIX}
-        URL ${FindOrBuildICU_URL}
-        URL_HASH ${FindOrBuildICU_URL_HASH}
-        PATCH_COMMAND ${ICU_EP_PATCH_COMMAND}
-        CONFIGURE_COMMAND CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} CFLAGS=${ICU_CFLAGS} CXXFLAGS=${ICU_CXXFLAGS} ${ICU_EP_PREFIX}/src/ExternalICU/source/runConfigureICU ${ICU_PLATFORM}
-        --disable-shared --enable-static --disable-dyload --disable-extras
-        --disable-tests --disable-samples
-        --prefix=<INSTALL_DIR>
-        BUILD_COMMAND make ${ICU_MAKE_EXTRA_FLAGS}
-        INSTALL_COMMAND make install
-        BUILD_BYPRODUCTS ${ICU_EP_LIBICUDATA};${ICU_EP_LIBICUI18N};${ICU_EP_LIBICUUC}
+        PREFIX
+          ${ICU_EP_PREFIX}
+        DOWNLOAD_DIR
+          ${PROJECT_SOURCE_DIR}/deps/icu-${FindOrBuildICU_VERSION}
+        URL
+          ${FindOrBuildICU_URL}
+        URL_HASH
+          ${FindOrBuildICU_URL_HASH}
+        PATCH_COMMAND
+          ${ICU_EP_PATCH_COMMAND}
+        CONFIGURE_COMMAND
+          ${CMAKE_COMMAND} -E env
+            CC=${CMAKE_C_COMPILER}
+            CXX=${CMAKE_CXX_COMPILER}
+            CFLAGS=${ICU_CFLAGS}
+            CXXFLAGS=${ICU_CXXFLAGS}
+          sh ${ICU_EP_PREFIX}/src/ExternalICU/source/configure
+            --disable-shared --enable-static --disable-dyload --disable-extras
+            --disable-tests --disable-samples
+            --prefix=<INSTALL_DIR>
+        BUILD_COMMAND
+          make ${ICU_MAKE_EXTRA_FLAGS}
+        INSTALL_COMMAND
+          make install
+        BUILD_BYPRODUCTS
+          ${ICU_EP_LIBICUDATA};${ICU_EP_LIBICUI18N};${ICU_EP_LIBICUUC}
       )
       set(ICU_INCLUDE_DIRS ${ICU_EP_PREFIX}/include)
 
