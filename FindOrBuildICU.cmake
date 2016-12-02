@@ -68,7 +68,7 @@ function(FindOrBuildICU)
         set(ICU_MAKE_EXTRA_FLAGS "-j${CORES}")
       endif()
 
-      set(ICU_EP_PREFIX ${PROJECT_SOURCE_DIR}/deps/icu)
+      set(ICU_EP_PREFIX ${PROJECT_BINARY_DIR}/deps/icu-${FindOrBuildICU_VERSION})
 
       if (MINGW)
         set(ICU_EP_LIBICUDATA ${ICU_EP_PREFIX}/lib/sicudt.a)
