@@ -48,12 +48,10 @@ function(FindOrBuildICU)
       message("-- ICU building not supported on Windows.")
       message(FATAL_ERROR "   -- Please download the latest ICU binaries from http://site.icu-project.org/download")
     elseif(UNIX OR MINGW)
-      # if we're compling with position independent code, force ICU to do
-      # so as well
-      if (CMAKE_POSITION_INDEPENDENT_CODE OR BUILD_SHARED_LIBS)
-        set(ICU_CFLAGS "-fPIC")
-        set(ICU_CXXFLAGS "-fPIC")
-      endif()
+      # always build with position independent code in case we are linked
+      # against a shared library
+      set(ICU_CFLAGS "-fPIC")
+      set(ICU_CXXFLAGS "-fPIC")
 
       # determine a reasonable number of threads to build ICU with
       include(ProcessorCount)
