@@ -21,3 +21,6 @@
 
 // SharedPtrAtomics.cmake
 #cmakedefine01 META_HAS_SHARED_PTR_ATOMICS
+
+// MaxAlignT.cmake
+#cmakedefine META_MAX_ALIGN_T @META_MAX_ALIGN_T@
