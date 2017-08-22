@@ -9,6 +9,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
   if (STDCXX_FILESYSTEM)
     message("-- Found libstdc++ filesystem library: ${STDCXX_FILESYSTEM}")
     set(STD_EXPERIMENTAL_FILESYSTEM_LIBRARIES ${STDCXX_FILESYSTEM})
+    set(STD_EXPERIMENTAL_FILESYSTEM_FOUND TRUE)
   else()
     message("-- Locating libstdc++ filesystem library - not found")
   endif()
@@ -25,14 +26,23 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND LIBCXX_LIBRARY)
   if (LIBCXX_EXPERIMENTAL)
     message("-- Found libc++experimental library: ${LIBCXX_EXPERIMENTAL}")
     set(STD_EXPERIMENTAL_FILESYSTEM_LIBRARIES ${LIBCXX_EXPERIMENTAL})
+    set(STD_EXPERIMENTAL_FILESYSTEM_FOUND TRUE)
   else()
     message("-- Locating libc++experimental library - not found")
   endif()
 endif()
 
-if (STD_EXPERIMENTAL_FILESYSTEM_LIBRARIES)
+# experimental::filesystem is available by default for MSVC 2015 and newer
+if (MSVC_VERSION AND NOT (MSVC_VERSION LESS 1900))
+  set(STD_EXPERIMENTAL_FILESYSTEM_FOUND TRUE)
+endif()
+
+if (STD_EXPERIMENTAL_FILESYSTEM_FOUND)
   message("-- Determining experimental filesystem library capabilities")
-  set(CMAKE_REQUIRED_LIBRARIES "${CMAKE_REQUIRED_LIBRARIES} ${STD_EXPERIMENTAL_FILESYSTEM_LIBRARIES}")
+
+  if (STD_EXPERIMENTAL_FILESYSTEM_LIBRARIES)
+    set(CMAKE_REQUIRED_LIBRARIES "${CMAKE_REQUIRED_LIBRARIES} ${STD_EXPERIMENTAL_FILESYSTEM_LIBRARIES}")
+  endif()
   check_cxx_source_compiles("
   #include <experimental/filesystem>
 
@@ -47,8 +57,10 @@ if (STD_EXPERIMENTAL_FILESYSTEM_LIBRARIES)
     target_compile_definitions(compiler-kludges INTERFACE
       -DMETA_HAS_EXPERIMENTAL_FILESYSTEM)
 
-    target_link_libraries(compiler-kludges INTERFACE
-      ${STD_EXPERIMENTAL_FILESYSTEM_LIBRARIES})
+    if (STD_EXPERIMENTAL_FILESYSTEM_LIBRARIES)
+      target_link_libraries(compiler-kludges INTERFACE
+        ${STD_EXPERIMENTAL_FILESYSTEM_LIBRARIES})
+    endif()
 
     # experimental::filesystem::remove_all doesn't recurse properly as of GCC
     # 5.3.
