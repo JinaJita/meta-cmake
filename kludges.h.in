@@ -31,3 +31,7 @@
 // CountTrailingZeros.cmake
 #cmakedefine01 META_HAS_BUILTIN_CTZLL
 #cmakedefine01 META_HAS_BITSCANFORWARD64
+
+// PopCount.cmake
+#cmakedefine01 META_HAS_BUILTIN_POPCOUNTLL
+#cmakedefine01 META_HAS_POPCOUNT64
