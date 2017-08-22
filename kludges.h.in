@@ -27,3 +27,7 @@
 
 // PromiseWithNoDefaultCtor.cmake
 #cmakedefine01 META_HAS_PROMISE_WITH_NO_DEFAULT_CTOR
+
+// CountTrailingZeros.cmake
+#cmakedefine01 META_HAS_BUILTIN_CTZLL
+#cmakedefine01 META_HAS_BITSCANFORWARD64
