@@ -1,4 +1,5 @@
 check_cxx_source_compiles("
+#include <cstdint>
 int main()
 {
     uint64_t val = 1;
@@ -12,6 +13,7 @@ if (META_HAS_BUILTIN_CTZLL)
 endif()
 
 check_cxx_source_compiles("
+#include <cstdint>
 #include <intrin.h>
 
 int main()
