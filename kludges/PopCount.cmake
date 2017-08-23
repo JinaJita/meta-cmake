@@ -19,7 +19,7 @@ check_cxx_source_compiles("
 int main()
 {
     uint64_t val = 1;
-    auto result = _popcount64(val);
+    auto result = __popcnt64(val);
     return 0;
 }" META_HAS_POPCOUNT64)
 
