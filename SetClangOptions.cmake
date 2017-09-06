@@ -14,6 +14,4 @@ macro(SetClangOptions interface_lib)
     find_package(LIBCXX REQUIRED)
     set_libcxx_required_flags()
   endif()
-
-  set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} -l${CMAKE_DL_LIBS}")
 endmacro()
