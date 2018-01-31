@@ -48,7 +48,8 @@ if (STD_EXPERIMENTAL_FILESYSTEM_FOUND)
 
   int main()
   {
-      std::experimental::filesystem::path p1 = \"/home/meta/tmp/123456\";
+      std::string path = \"/home/meta/tmp/123456\";
+      const auto p1 = std::experimental::filesystem::u8path(path);
       std::experimental::filesystem::remove_all(p1);
       return 0;
   }" META_HAS_EXPERIMENTAL_FILESYSTEM)
