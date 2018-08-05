@@ -10,7 +10,7 @@ macro(SetClangOptions interface_lib)
     target_compile_options(${interface_lib} INTERFACE "-fcolor-diagnostics")
   endif()
 
-  if (ENABLE_LIBCXX)
+  if (NOT APPLE AND ENABLE_LIBCXX)
     find_package(LIBCXX REQUIRED)
     set_libcxx_required_flags()
   endif()
