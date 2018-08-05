@@ -9,11 +9,12 @@ if(LIBCXX_LIBRARY)
   get_filename_component(LIBCXX_LIB_PATH ${LIBCXX_LIBRARY}
     DIRECTORY)
   find_path(LIBCXX_PREFIX c++/v1/algorithm
-    PATHS ${LIBCXX_LIB_PATH}/../include
-    ${CMAKE_SYSTEM_PREFIX_PATH}
-    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include
-    /Library/Developer/CommandLineTools/usr/include)
-    
+    PATHS
+      ${LIBCXX_LIB_PATH}/../include
+      /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include
+      /Library/Developer/CommandLineTools/usr/include
+      ${CMAKE_SYSTEM_PREFIX_PATH})
+
   if (LIBCXX_PREFIX)
     set(LIBCXX_INCLUDE_DIR ${LIBCXX_PREFIX}/c++/v1/)
     message("-- Located libc++ include path: ${LIBCXX_INCLUDE_DIR}")
