@@ -11,8 +11,9 @@ if(LIBCXX_LIBRARY)
   find_path(LIBCXX_PREFIX c++/v1/algorithm
     PATHS ${LIBCXX_LIB_PATH}/../include
     ${CMAKE_SYSTEM_PREFIX_PATH}
-    /Library/Developer/CommandLineTools/usr/include
-    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include)
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include
+    /Library/Developer/CommandLineTools/usr/include)
+    
   if (LIBCXX_PREFIX)
     set(LIBCXX_INCLUDE_DIR ${LIBCXX_PREFIX}/c++/v1/)
     message("-- Located libc++ include path: ${LIBCXX_INCLUDE_DIR}")
