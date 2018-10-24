@@ -6,9 +6,11 @@
 // Expect.cmake
 #cmakedefine01 META_HAS_BUILTIN_EXPECT
 
-// ExperimentalFilesystem.cmake
+// StdFilesystem.cmake
+#cmakedefine01 META_HAS_FILESYSTEM
+#cmakedefine01 META_HAS_STD_FILESYSTEM
 #cmakedefine01 META_HAS_EXPERIMENTAL_FILESYSTEM
-#cmakedefine01 META_HAS_EXPERIMENTAL_FILESYSTEM_REMOVE_ALL
+#cmakedefine01 META_HAS_WORKING_FILESYSTEM_REMOVE_ALL
 
 // ExperimentalOptional.cmake
 #cmakedefine01 META_HAS_EXPERIMENTAL_OPTIONAL
