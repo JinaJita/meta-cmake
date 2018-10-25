@@ -12,7 +12,9 @@
 #cmakedefine01 META_HAS_EXPERIMENTAL_FILESYSTEM
 #cmakedefine01 META_HAS_WORKING_FILESYSTEM_REMOVE_ALL
 
-// ExperimentalOptional.cmake
+// StdOptional.cmake
+#cmakedefine01 META_HAS_OPTIONAL
+#cmakedefine01 META_HAS_STD_OPTIONAL
 #cmakedefine01 META_HAS_EXPERIMENTAL_OPTIONAL
 
 // ExperimentalStringView.cmake
