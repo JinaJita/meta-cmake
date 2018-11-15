@@ -1,0 +1,158 @@
+diff --git a/icu4c/source/common/umutex.h b/icu4c/source/common/umutex.h
+index 015a12f9634..a15e7a4fc33 100644
+--- a/icu4c/source/common/umutex.h
++++ b/icu4c/source/common/umutex.h
+@@ -54,15 +54,23 @@ U_NAMESPACE_END
+ 
+ #include <atomic>
+ 
+-U_NAMESPACE_BEGIN
+-
+ // Export an explicit template instantiation of std::atomic<int32_t>. 
+ // When building DLLs for Windows this is required as it is used as a data member of the exported SharedObject class.
+ // See digitlst.h, pluralaffix.h, datefmt.h, and others for similar examples.
+-#if U_PF_WINDOWS <= U_PLATFORM && U_PLATFORM <= U_PF_CYGWIN
++#if U_PF_WINDOWS <= U_PLATFORM && U_PLATFORM <= U_PF_CYGWIN && !defined(U_IN_DOXYGEN)
++  #if defined(__clang__)
++  // Suppress the warning that the explicit instantiation after explicit specialization has no effect.
++  #pragma clang diagnostic push
++  #pragma clang diagnostic ignored "-Winstantiation-after-specialization"
++  #endif
+ template struct U_COMMON_API std::atomic<int32_t>;
++  #if defined(__clang__)
++  #pragma clang diagnostic pop
++  #endif
+ #endif
+ 
++U_NAMESPACE_BEGIN
++
+ typedef std::atomic<int32_t> u_atomic_int32_t;
+ #define ATOMIC_INT32_T_INITIALIZER(val) ATOMIC_VAR_INIT(val)
+ 
+diff --git a/icu4c/source/common/unicode/urename.h b/icu4c/source/common/unicode/urename.h
+index 5812173e39c..0512be3b6e5 100644
+--- a/icu4c/source/common/unicode/urename.h
++++ b/icu4c/source/common/unicode/urename.h
+@@ -110,7 +110,6 @@
+ #define _UTF7Data U_ICU_ENTRY_POINT_RENAME(_UTF7Data)
+ #define _UTF8Data U_ICU_ENTRY_POINT_RENAME(_UTF8Data)
+ #define allowedHourFormatsCleanup U_ICU_ENTRY_POINT_RENAME(allowedHourFormatsCleanup)
+-#define checkImpl U_ICU_ENTRY_POINT_RENAME(checkImpl)
+ #define cmemory_cleanup U_ICU_ENTRY_POINT_RENAME(cmemory_cleanup)
+ #define dayPeriodRulesCleanup U_ICU_ENTRY_POINT_RENAME(dayPeriodRulesCleanup)
+ #define deleteAllowedHourFormats U_ICU_ENTRY_POINT_RENAME(deleteAllowedHourFormats)
+diff --git a/icu4c/source/i18n/fmtable.cpp b/icu4c/source/i18n/fmtable.cpp
+index 45c7024fc29..8601d95f4a6 100644
+--- a/icu4c/source/i18n/fmtable.cpp
++++ b/icu4c/source/i18n/fmtable.cpp
+@@ -734,7 +734,7 @@ CharString *Formattable::internalGetCharString(UErrorCode &status) {
+       // not print scientific notation for magnitudes greater than -5 and smaller than some amount (+5?).
+       if (fDecimalQuantity->isZero()) {
+         fDecimalStr->append("0", -1, status);
+-      } else if (std::abs(fDecimalQuantity->getMagnitude()) < 5) {
++      } else if (fDecimalQuantity->getMagnitude() != INT32_MIN && std::abs(fDecimalQuantity->getMagnitude()) < 5) {
+         fDecimalStr->appendInvariantChars(fDecimalQuantity->toPlainString(), status);
+       } else {
+         fDecimalStr->appendInvariantChars(fDecimalQuantity->toScientificString(), status);
+diff --git a/icu4c/source/i18n/japancal.cpp b/icu4c/source/i18n/japancal.cpp
+index 5159be337c2..e2a14024083 100644
+--- a/icu4c/source/i18n/japancal.cpp
++++ b/icu4c/source/i18n/japancal.cpp
+@@ -18,6 +18,16 @@
+ #if !UCONFIG_NO_FORMATTING
+ #if U_PLATFORM_HAS_WINUWP_API == 0
+ #include <stdlib.h> // getenv() is not available in UWP env
++#else
++#ifndef WIN32_LEAN_AND_MEAN
++#   define WIN32_LEAN_AND_MEAN
++#endif
++#   define VC_EXTRALEAN
++#   define NOUSER
++#   define NOSERVICE
++#   define NOIME
++#   define NOMCX
++#include <windows.h>
+ #endif
+ #include "cmemory.h"
+ #include "erarules.h"
+diff --git a/icu4c/source/i18n/number_decimalquantity.cpp b/icu4c/source/i18n/number_decimalquantity.cpp
+index 2c4182b1c6e..f6f2b20fab0 100644
+--- a/icu4c/source/i18n/number_decimalquantity.cpp
++++ b/icu4c/source/i18n/number_decimalquantity.cpp
+@@ -820,7 +820,10 @@ UnicodeString DecimalQuantity::toScientificString() const {
+     }
+     result.append(u'E');
+     int32_t _scale = upperPos + scale;
+-    if (_scale < 0) {
++    if (_scale == INT32_MIN) {
++        result.append({u"-2147483648", -1});
++        return result;
++    } else if (_scale < 0) {
+         _scale *= -1;
+         result.append(u'-');
+     } else {
+diff --git a/icu4c/source/i18n/unicode/numberrangeformatter.h b/icu4c/source/i18n/unicode/numberrangeformatter.h
+index 50546839edf..d5466b12766 100644
+--- a/icu4c/source/i18n/unicode/numberrangeformatter.h
++++ b/icu4c/source/i18n/unicode/numberrangeformatter.h
+@@ -185,8 +185,14 @@ class NumberRangeFormatterImpl;
+  * Export an explicit template instantiation. See datefmt.h
+  * (When building DLLs for Windows this is required.)
+  */
+-#if U_PF_WINDOWS <= U_PLATFORM && U_PLATFORM <= U_PF_CYGWIN && !defined(U_IN_DOXYGEN)
+-template struct U_I18N_API std::atomic<impl::NumberRangeFormatterImpl*>;
++#if U_PLATFORM == U_PF_WINDOWS && !defined(U_IN_DOXYGEN)
++} // namespace icu::number
++U_NAMESPACE_END
++
++template struct U_I18N_API std::atomic< U_NAMESPACE_QUALIFIER number::impl::NumberRangeFormatterImpl*>;
++
++U_NAMESPACE_BEGIN
++namespace number {  // icu::number
+ #endif
+ /** \endcond */
+ 
+diff --git a/icu4c/source/i18n/uspoof.cpp b/icu4c/source/i18n/uspoof.cpp
+index 8e3d69ede2b..66f228f037a 100644
+--- a/icu4c/source/i18n/uspoof.cpp
++++ b/icu4c/source/i18n/uspoof.cpp
+@@ -547,7 +547,7 @@ uspoof_checkUnicodeString(const USpoofChecker *sc,
+     return uspoof_check2UnicodeString(sc, id, NULL, status);
+ }
+ 
+-int32_t checkImpl(const SpoofImpl* This, const UnicodeString& id, CheckResult* checkResult, UErrorCode* status) {
++static int32_t checkImpl(const SpoofImpl* This, const UnicodeString& id, CheckResult* checkResult, UErrorCode* status) {
+     U_ASSERT(This != NULL);
+     U_ASSERT(checkResult != NULL);
+     checkResult->clear();
+diff --git a/icu4c/source/test/intltest/numbertest.h b/icu4c/source/test/intltest/numbertest.h
+index 49c2d4411a9..1c109df5b6a 100644
+--- a/icu4c/source/test/intltest/numbertest.h
++++ b/icu4c/source/test/intltest/numbertest.h
+@@ -10,6 +10,7 @@
+ #include "intltest.h"
+ #include "number_affixutils.h"
+ #include "numparse_stringsegment.h"
++#include "numrange_impl.h"
+ #include "unicode/locid.h"
+ #include "unicode/numberformatter.h"
+ #include "unicode/numberrangeformatter.h"
+diff --git a/icu4c/source/test/intltest/numfmtst.cpp b/icu4c/source/test/intltest/numfmtst.cpp
+index 34355939113..8d52dc122bf 100644
+--- a/icu4c/source/test/intltest/numfmtst.cpp
++++ b/icu4c/source/test/intltest/numfmtst.cpp
+@@ -9226,6 +9226,14 @@ void NumberFormatTest::Test20037_ScientificIntegerOverflow() {
+     assertEquals(u"Should not overflow and should parse only the first exponent",
+                  u"1E-2147483647",
+                  {sp.data(), sp.length(), US_INV});
++
++    // Test edge case overflow of exponent
++    result = Formattable();
++    nf->parse(u".0003e-2147483644", result, status);
++    sp = result.getDecimalNumber(status);
++    assertEquals(u"Should not overflow",
++                 u"3E-2147483648",
++                 {sp.data(), sp.length(), US_INV});
+ }
+ 
+ void NumberFormatTest::Test13840_ParseLongStringCrash() {

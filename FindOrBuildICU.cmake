@@ -69,10 +69,14 @@ function(FindOrBuildICU)
       set(ICU_EP_PREFIX ${PROJECT_BINARY_DIR}/deps/icu-${FindOrBuildICU_VERSION})
 
       if (MINGW)
-        set(ICU_EP_LIBICUDATA ${ICU_EP_PREFIX}/lib/sicudt.a)
+        if (${FindOrBuildICU_VERSION} VERSION_LESS 63.1)
+          set(ICU_EP_LIBICUDATA ${ICU_EP_PREFIX}/lib/sicudt.a)
+        else()
+          set(ICU_EP_LIBICUDATA ${ICU_EP_PREFIX}/lib/libsicudt.a)
+        endif()
         set(ICU_EP_LIBICUI18N ${ICU_EP_PREFIX}/lib/libsicuin.a)
         set(ICU_EP_LIBICUUC ${ICU_EP_PREFIX}/lib/libsicuuc.a)
-        set(ICU_EP_PATCH_COMMAND patch -p0 -i ${FIND_OR_BUILD_ICU_DIR}/msys-mkinstalldirs.patch)
+        set(ICU_EP_PATCH_COMMAND patch -p0 -i ${FIND_OR_BUILD_ICU_DIR}/icu-patches/msys-mkinstalldirs.patch)
         # Fix for ICU 58.1 using strtod_l stuff when unavailable on MinGW
         set(ICU_CFLAGS "${ICU_CFLAGS} -DU_USE_STRTOD_L=U_HAVE_STRTOD_L")
         set(ICU_CXXFLAGS "${ICU_CXXFLAGS} -DU_USE_STRTOD_L=U_HAVE_STRTOD_L")
@@ -111,6 +115,17 @@ function(FindOrBuildICU)
         BUILD_BYPRODUCTS
           ${ICU_EP_LIBICUDATA};${ICU_EP_LIBICUI18N};${ICU_EP_LIBICUUC}
       )
+
+      if (MINGW AND ${FindOrBuildICU_VERSION} VERSION_EQUAL 63.1)
+        ExternalProject_Add_Step(ExternalICU
+          patch-mingw
+          COMMAND patch -p2 -i ${FIND_OR_BUILD_ICU_DIR}/icu-patches/maint-63.diff
+          WORKING_DIRECTORY <SOURCE_DIR>
+          DEPENDEES download
+          DEPENDERS configure
+        )
+      endif()
+
       set(ICU_INCLUDE_DIRS ${ICU_EP_PREFIX}/include)
 
       add_library(icudata IMPORTED STATIC)
