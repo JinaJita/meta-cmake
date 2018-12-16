@@ -3,11 +3,11 @@ check_cxx_source_compiles("
 int main() {
     return 0;
 }"
-META_HAS_STRING_VIEW)
+META_HAS_STRING_VIEW_HEADER)
 
-if (META_HAS_STRING_VIEW)
+if (META_HAS_STRING_VIEW_HEADER)
   target_compile_definitions(compiler-kludges INTERFACE
-    -DMETA_HAS_STRING_VIEW)
+    -DMETA_HAS_STRING_VIEW_HEADER)
 
   check_cxx_source_compiles("
   #include <string_view>
@@ -37,6 +37,12 @@ else()
       return 0;
   }"
   META_HAS_EXPERIMENTAL_STRING_VIEW)
+
+  if (META_HAS_EXPERIMENTAL_STRING_VIEW)
+    set(META_HAS_EXPERIMENTAL_STRING_VIEW_HEADER TRUE)
+    target_compile_definitions(compiler-kludges INTERFACE
+      -DMETA_HAS_EXPERIMENTAL_STRING_VIEW_HEADER)
+  endif()
 endif()
 
 if (META_HAS_EXPERIMENTAL_STRING_VIEW)

@@ -3,11 +3,11 @@ check_cxx_source_compiles("
 int main() {
     return 0;
 }"
-META_HAS_OPTIONAL)
+META_HAS_OPTIONAL_HEADER)
 
-if (META_HAS_OPTIONAL)
+if (META_HAS_OPTIONAL_HEADER)
   target_compile_definitions(compiler-kludges INTERFACE
-    -DMETA_HAS_OPTIONAL)
+    -DMETA_HAS_OPTIONAL_HEADER)
 
   check_cxx_source_compiles("
   #include <optional>
@@ -37,6 +37,12 @@ else()
       return 0;
   }"
   META_HAS_EXPERIMENTAL_OPTIONAL)
+
+  if (META_HAS_EXPERIMENTAL_OPTIONAL)
+    set(META_HAS_EXPERIMENTAL_OPTIONAL_HEADER TRUE)
+    target_compile_definitions(compiler-kludges INTERFACE
+      -DMETA_HAS_EXPERIMENTAL_OPTIONAL_HEADER)
+  endif()
 endif()
 
 if (META_HAS_EXPERIMENTAL_OPTIONAL)
